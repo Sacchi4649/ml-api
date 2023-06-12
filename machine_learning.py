@@ -13,21 +13,13 @@ import sys
 import json
 import requests
 import pandas as pd
-import certifi
-import pymongo
+import database
 
-
-connection_url = 'mongodb+srv://arif05rachman:20082009@arif05rachman.pfggb.mongodb.net/?retryWrites=true&w=majority'
-client = pymongo.MongoClient(connection_url, tlsCAFile=certifi.where())
-# Database
-Database = client.get_database('holiYAY')
-# Table
-collection = Database.locations
 
 # replace 'yourfile.csv' with your uploaded file name
 # df = pd.read_csv(
 #     'https://storage.googleapis.com/capstone-c23-ps182/tourism_with_id.csv')
-query = collection.find()
+query = database.connection().find()
 df = pd.DataFrame(list(query))
 # Preprocessing the descriptions
 df = df['Description'].apply(lambda x: x.lower().split())
@@ -45,9 +37,9 @@ df = df['Description'].apply(lambda x: x.lower().split())
 # vocab, index = {}, 1  # start indexing from 1
 # vocab['<pad>'] = 0  # add a padding token
 # for token in tokens:
-#   if token not in vocab:
-#     vocab[token] = index
-#     index += 1
+#     if token not in vocab:
+#         vocab[token] = index
+#         index += 1
 # vocab_size = len(vocab)
 # print(vocab)
 
@@ -66,8 +58,8 @@ df = df['Description'].apply(lambda x: x.lower().split())
 # print(len(positive_skip_grams))
 
 # for target, context in positive_skip_grams[:5]:
-#   print(
-#       f"({target}, {context}): ({inverse_vocab[target]}, {inverse_vocab[context]})")
+#     print(
+#         f"({target}, {context}): ({inverse_vocab[target]}, {inverse_vocab[context]})")
 
 # # Get target and context words for one positive skip-gram.
 # target_word, context_word = positive_skip_grams[0]
@@ -107,49 +99,49 @@ df = df['Description'].apply(lambda x: x.lower().split())
 
 
 # def generate_training_data(sequences, window_size, num_ns, vocab_size, seed):
-#   # Elements of each training example are appended to these lists.
-#   targets, contexts, labels = [], [], []
+#     # Elements of each training example are appended to these lists.
+#     targets, contexts, labels = [], [], []
 
-#   # Build the sampling table for `vocab_size` tokens.
-#   sampling_table = tf.keras.preprocessing.sequence.make_sampling_table(
-#       vocab_size)
+#     # Build the sampling table for `vocab_size` tokens.
+#     sampling_table = tf.keras.preprocessing.sequence.make_sampling_table(
+#         vocab_size)
 
-#   # Iterate over all sequences (sentences) in the dataset.
-#   for sequence in tqdm.tqdm(sequences):
+#     # Iterate over all sequences (sentences) in the dataset.
+#     for sequence in tqdm.tqdm(sequences):
 
-#     # Generate positive skip-gram pairs for a sequence (sentence).
-#     positive_skip_grams, _ = tf.keras.preprocessing.sequence.skipgrams(
-#         sequence,
-#         vocabulary_size=vocab_size,
-#         sampling_table=sampling_table,
-#         window_size=window_size,
-#         negative_samples=0)
+#         # Generate positive skip-gram pairs for a sequence (sentence).
+#         positive_skip_grams, _ = tf.keras.preprocessing.sequence.skipgrams(
+#             sequence,
+#             vocabulary_size=vocab_size,
+#             sampling_table=sampling_table,
+#             window_size=window_size,
+#             negative_samples=0)
 
-#     # Iterate over each positive skip-gram pair to produce training examples
-#     # with a positive context word and negative samples.
-#     for target_word, context_word in positive_skip_grams:
-#       context_class = tf.expand_dims(
-#           tf.constant([context_word], dtype="int64"), 1)
-#       negative_sampling_candidates, _, _ = tf.random.log_uniform_candidate_sampler(
-#           true_classes=context_class,
-#           num_true=1,
-#           num_sampled=num_ns,
-#           unique=True,
-#           range_max=vocab_size,
-#           seed=seed,
-#           name="negative_sampling")
+#         # Iterate over each positive skip-gram pair to produce training examples
+#         # with a positive context word and negative samples.
+#         for target_word, context_word in positive_skip_grams:
+#             context_class = tf.expand_dims(
+#                 tf.constant([context_word], dtype="int64"), 1)
+#             negative_sampling_candidates, _, _ = tf.random.log_uniform_candidate_sampler(
+#                 true_classes=context_class,
+#                 num_true=1,
+#                 num_sampled=num_ns,
+#                 unique=True,
+#                 range_max=vocab_size,
+#                 seed=seed,
+#                 name="negative_sampling")
 
-#       # Build context and label vectors (for one target word)
-#       context = tf.concat([tf.squeeze(context_class, 1),
-#                           negative_sampling_candidates], 0)
-#       label = tf.constant([1] + [0]*num_ns, dtype="int64")
+#             # Build context and label vectors (for one target word)
+#             context = tf.concat([tf.squeeze(context_class, 1),
+#                                 negative_sampling_candidates], 0)
+#             label = tf.constant([1] + [0]*num_ns, dtype="int64")
 
-#       # Append each element from the training example to global lists.
-#       targets.append(target_word)
-#       contexts.append(context)
-#       labels.append(label)
+#             # Append each element from the training example to global lists.
+#             targets.append(target_word)
+#             contexts.append(context)
+#             labels.append(label)
 
-#   return targets, contexts, labels
+#     return targets, contexts, labels
 
 
 # def column_to_txt(query, column_name, txt_file):
@@ -168,10 +160,10 @@ df = df['Description'].apply(lambda x: x.lower().split())
 
 # column_to_txt(query, column_index, txt_file)
 
-# with open('tourism_with_id.txt') as f:
-#   lines = f.read().splitlines()
+# with open('tourism_with_id.txt', 'r', encoding='utf-8', errors='replace') as f:
+#     lines = f.read().splitlines()
 # for line in lines[:20]:
-#   print(line)
+#     print(line)
 
 # text_ds = tf.data.TextLineDataset(
 #     'tourism_with_id.txt').filter(lambda x: tf.cast(tf.strings.length(x), bool))
@@ -181,9 +173,9 @@ df = df['Description'].apply(lambda x: x.lower().split())
 
 
 # def custom_standardization(input_data):
-#   lowercase = tf.strings.lower(input_data)
-#   return tf.strings.regex_replace(lowercase,
-#                                   '[%s]' % re.escape(string.punctuation), '')
+#     lowercase = tf.strings.lower(input_data)
+#     return tf.strings.regex_replace(lowercase,
+#                                     '[%s]' % re.escape(string.punctuation), '')
 
 
 # # Define the vocabulary size and the number of words in a sequence.
@@ -213,7 +205,7 @@ df = df['Description'].apply(lambda x: x.lower().split())
 # print(len(sequences))
 
 # for seq in sequences[:5]:
-#   print(f"{seq} => {[inverse_vocab[i] for i in seq]}")
+#     print(f"{seq} => {[inverse_vocab[i] for i in seq]}")
 
 # targets, contexts, labels = generate_training_data(
 #     sequences=sequences,
@@ -242,30 +234,30 @@ df = df['Description'].apply(lambda x: x.lower().split())
 
 
 # class Word2Vec(tf.keras.Model):
-#   def __init__(self, vocab_size, embedding_dim):
-#     super(Word2Vec, self).__init__()
-#     self.target_embedding = layers.Embedding(vocab_size,
-#                                              embedding_dim,
-#                                              input_length=1,
-#                                              name="w2v_embedding")
-#     self.context_embedding = layers.Embedding(vocab_size,
-#                                               embedding_dim,
-#                                               input_length=num_ns+1)
+#     def __init__(self, vocab_size, embedding_dim):
+#         super(Word2Vec, self).__init__()
+#         self.target_embedding = layers.Embedding(vocab_size,
+#                                                  embedding_dim,
+#                                                  input_length=1,
+#                                                  name="w2v_embedding")
+#         self.context_embedding = layers.Embedding(vocab_size,
+#                                                   embedding_dim,
+#                                                   input_length=num_ns+1)
 
-#   def call(self, pair):
-#     target, context = pair
-#     # target: (batch, dummy?)  # The dummy axis doesn't exist in TF2.7+
-#     # context: (batch, context)
-#     if len(target.shape) == 2:
-#       target = tf.squeeze(target, axis=1)
-#     # target: (batch,)
-#     word_emb = self.target_embedding(target)
-#     # word_emb: (batch, embed)
-#     context_emb = self.context_embedding(context)
-#     # context_emb: (batch, context, embed)
-#     dots = tf.einsum('be,bce->bc', word_emb, context_emb)
-#     # dots: (batch, context)
-#     return dots
+#     def call(self, pair):
+#         target, context = pair
+#         # target: (batch, dummy?)  # The dummy axis doesn't exist in TF2.7+
+#         # context: (batch, context)
+#         if len(target.shape) == 2:
+#             target = tf.squeeze(target, axis=1)
+#         # target: (batch,)
+#         word_emb = self.target_embedding(target)
+#         # word_emb: (batch, embed)
+#         context_emb = self.context_embedding(context)
+#         # context_emb: (batch, context, embed)
+#         dots = tf.einsum('be,bce->bc', word_emb, context_emb)
+#         # dots: (batch, context)
+#         return dots
 
 
 # embedding_dim = 200
@@ -286,76 +278,83 @@ df = df['Description'].apply(lambda x: x.lower().split())
 # out_m = io.open('metadata.tsv', 'w', encoding='utf-8')
 
 # for index, word in enumerate(vocab):
-#   if index == 0:
-#     continue  # skip 0, it's padding.
-#   vec = weights[index]
-#   out_v.write('\t'.join([str(x) for x in vec]) + "\n")
-#   out_m.write(word + "\n")
+#     if index == 0:
+#         continue  # skip 0, it's padding.
+#     vec = weights[index]
+#     out_v.write('\t'.join([str(x) for x in vec]) + "\n")
+#     out_m.write(word + "\n")
 # out_v.close()
 # out_m.close()
 
-"""#Infer 1"""
+# # try:
+# #   from google.colab import files
+# #   files.download('vectors.tsv')
+# #   files.download('metadata.tsv')
+# # except Exception:
+# #   pass
 
-vectors = pd.read_csv('vectors.tsv', sep='\t', header=None)
+# """#Infer 1"""
 
-vectors
+# vectors = pd.read_csv('vectors.tsv', sep='\t', header=None)
 
-vectors_list = vectors.values.tolist()
-vectors_array = np.array(vectors_list)
+# vectors
 
-metadata = pd.read_csv('metadata.tsv', sep='\t', header=None)
+# vectors_list = vectors.values.tolist()
+# vectors_array = np.array(vectors_list)
 
-metadata
+# metadata = pd.read_csv('metadata.tsv', sep='\t', header=None)
 
-metadata.values[:6639]
+# metadata
 
-vectors_dict = {}
-for i, row in enumerate(metadata.values):
-    vectors_dict[row[0]] = vectors_array[i]
+# metadata.values[:6639]
 
-"""bersehin df"""
+# vectors_dict = {}
+# for i, row in enumerate(metadata.values):
+#     vectors_dict[row[0]] = vectors_array[i]
 
-# df = pd.read_csv('tourism_with_id.csv')
-query = collection.find()
-df = pd.DataFrame(list(query))
-df_clean = df[['Place_Id',
-               '_id',
-               'Place_Name',
-               'Description',
-               'Category',
-               'Price',
-               'City',
-               'Time_Minutes',
-               'Coordinate',
-               'Lat',
-               'Long',
-               'Rating']]
-df_clean
+# """bersehin df"""
 
-desc_vs = []
-df['Description'] = df['Description'].apply(lambda x: x.lower().split())
-for desc in df['Description']:
-    desc_v = [vectors_dict[token]
-              for token in desc if token in vectors_dict.keys()]
-    desc_vs.append(np.array(desc_v).mean(axis=0))
-
-df_clean['Description_vecs'] = desc_vs
+# # df = pd.read_csv('tourism_with_id.csv')
+# query = collection.find()
+# df = pd.DataFrame(list(query))
+# df_clean = df[['Place_Id',
+#                '_id',
+#                'Place_Name',
+#                'Description',
+#                'Category',
+#                'Price',
+#                'City',
+#                'Time_Minutes',
+#                'Coordinate',
+#                'Lat',
+#                'Long',
+#                'Rating']]
 # df_clean
 
+# desc_vs = []
+# df['Description'] = df['Description'].apply(lambda x: x.lower().split())
+# for desc in df['Description']:
+#     desc_v = [vectors_dict[token]
+#               for token in desc if token in vectors_dict.keys()]
+#     desc_vs.append(np.array(desc_v).mean(axis=0))
 
-# Save the dictionary to a pickle file
-with open('./vector.pickle', 'wb') as pickle_file:
-    pickle.dump(vectors_dict, pickle_file)
+# df_clean['Description_vecs'] = desc_vs
+# # df_clean
 
 
-# Save the dictionary to a pickle file
-with open('./df_clean.pickle', 'wb') as pickle_file:
-    pickle.dump(df_clean, pickle_file)
+# # Save the dictionary to a pickle file
+# with open('./vector.pickle', 'wb') as pickle_file:
+#     pickle.dump(vectors_dict, pickle_file)
 
 
-# Save the dictionary to a pickle file
-with open('./vector.pickle', 'wb') as pickle_file:
-    pickle.dump(vectors_dict, pickle_file)
+# # Save the dictionary to a pickle file
+# with open('./df_clean.pickle', 'wb') as pickle_file:
+#     pickle.dump(df_clean, pickle_file)
+
+
+# # Save the dictionary to a pickle file
+# with open('./vector.pickle', 'wb') as pickle_file:
+#     pickle.dump(vectors_dict, pickle_file)
 
 """# FIX INFER"""
 
