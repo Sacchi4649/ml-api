@@ -13,13 +13,21 @@ import sys
 import json
 import requests
 import pandas as pd
-import database
+import certifi
+import pymongo
+
+connection_url = 'mongodb+srv://sanyadika:sany123@cluster0.xgxzwaq.mongodb.net/HoliYAY?retryWrites=true&w=majority'
+client = pymongo.MongoClient(connection_url, tlsCAFile=certifi.where())
+# Database
+Database = client.get_database('HoliYAY')
+# Table
+collection = Database.locations
 
 
 # replace 'yourfile.csv' with your uploaded file name
 # df = pd.read_csv(
 #     'https://storage.googleapis.com/capstone-c23-ps182/tourism_with_id.csv')
-query = database.connection().find()
+query = collection.find()
 df = pd.DataFrame(list(query))
 # Preprocessing the descriptions
 df = df['Description'].apply(lambda x: x.lower().split())
