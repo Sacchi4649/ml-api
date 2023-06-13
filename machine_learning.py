@@ -1,3 +1,4 @@
+from flask import jsonify
 from bson import ObjectId
 from tensorflow.keras import layers
 import tensorflow as tf
@@ -425,19 +426,19 @@ def recommend_destinations(user_input, city=None):
         #                  'place_name': city_df['Place_Name'].iloc[i],
         #                   'description': city_df['Description'].iloc[i],
         #                   'rating': city_df['Rating'].iloc[i]})
-        locations.append({'id': i,
-                          'id_mongo': JSONEncoder().encode(city_df['_id'].iloc[i]),
-                          'place_id': int(city_df['Place_Id'].iloc[i]),
-                          'place_name': city_df['Place_Name'].iloc[i],
-                          'category': city_df['Category'].iloc[i],
-                          'city': city_df['City'].iloc[i],
-                          'price': int(city_df['Price'].iloc[i]),
-                          'time_minutes': city_df['Time_Minutes'].iloc[i],
-                          'coordinate': city_df['Coordinate'].iloc[i],
-                          'lat': city_df['Lat'].iloc[i],
-                          'long': city_df['Long'].iloc[i],
-                          'description': city_df['Description'].iloc[i],
-                          'rating': city_df['Rating'].iloc[i]})
+        locations.append({
+            '_id': JSONEncoder().encode(city_df['_id'].iloc[i]).replace('\"', ""),
+            'place_id': int(city_df['Place_Id'].iloc[i]),
+            'place_name': city_df['Place_Name'].iloc[i],
+            'category': city_df['Category'].iloc[i],
+            'city': city_df['City'].iloc[i],
+            'price': int(city_df['Price'].iloc[i]),
+            #   'time_minutes': city_df['Time_Minutes'].iloc[i],
+            'coordinate': city_df['Coordinate'].iloc[i],
+            'lat': city_df['Lat'].iloc[i],
+            'long': city_df['Long'].iloc[i],
+            'description': city_df['Description'].iloc[i],
+            'rating': city_df['Rating'].iloc[i]})
         print(city_df)
 
    # Return the top 3 most similar destinations
