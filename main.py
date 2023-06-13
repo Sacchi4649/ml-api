@@ -1,11 +1,8 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-<<<<<<< Updated upstream
-=======
 # import pymongo
 # import numpy
 import json
->>>>>>> Stashed changes
 import machine_learning
 
 app = Flask(__name__)
@@ -20,13 +17,7 @@ def findAll():
     keywords = request.json["keywords"]
     city = request.json["city"]
     ML = machine_learning.recommend_destinations(keywords, city)
-<<<<<<< Updated upstream
     return jsonify(ML)
-=======
-
-    return jsonify({'recommendation': ML})
-    # return jsonify(ML)
->>>>>>> Stashed changes
 
 
 if __name__ == '__main__':
