@@ -326,14 +326,13 @@ df = df['Description'].apply(lambda x: x.lower().split())
 # # df = pd.read_csv('tourism_with_id.csv')
 # query = collection.find()
 # df = pd.DataFrame(list(query))
-# df_clean = df[['Place_Id',
-#                '_id',
+# df_clean = df[['_id',
 #                'Place_Name',
 #                'Description',
 #                'Category',
 #                'Price',
 #                'City',
-#                'Time_Minutes',
+#                'Image',
 #                'Coordinate',
 #                'Lat',
 #                'Long',
@@ -428,17 +427,18 @@ def recommend_destinations(user_input, city=None):
         #                   'rating': city_df['Rating'].iloc[i]})
         locations.append({
             '_id': JSONEncoder().encode(city_df['_id'].iloc[i]).replace('\"', ""),
-            'place_id': int(city_df['Place_Id'].iloc[i]),
+            # 'place_id': int(city_df['Place_Id'].iloc[i]),
             'place_name': city_df['Place_Name'].iloc[i],
+            'description': city_df['Description'].iloc[i],
             'category': city_df['Category'].iloc[i],
             'city': city_df['City'].iloc[i],
             'price': int(city_df['Price'].iloc[i]),
+            'rating': city_df['Rating'].iloc[i],
             #   'time_minutes': city_df['Time_Minutes'].iloc[i],
             'coordinate': city_df['Coordinate'].iloc[i],
             'lat': city_df['Lat'].iloc[i],
             'long': city_df['Long'].iloc[i],
-            'description': city_df['Description'].iloc[i],
-            'rating': city_df['Rating'].iloc[i]})
+            'image': city_df['Image'].iloc[i]})
         print(city_df)
 
    # Return the top 3 most similar destinations
